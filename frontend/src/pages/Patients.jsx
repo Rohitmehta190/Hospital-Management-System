@@ -1,31 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import PatientCard from '../components/PatientCard';
+import PatientForm from '../components/PatientForm';
+import { FiPlus, FiSearch, FiFilter, FiGrid, FiList, FiUsers } from 'react-icons/fi';
 
 const Patients = ({ user }) => {
   const [patients, setPatients] = useState([]);
+  const [filteredPatients, setFilteredPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
-  const [formData, setFormData] = useState({
-    user_id: 1, // This should come from authentication
-    first_name: '',
-    last_name: '',
-    date_of_birth: '',
-    gender: '',
-    phone: '',
-    address: '',
-    emergency_contact: ''
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [error, setError] = useState('');
 
   useEffect(() => {
     fetchPatients();
   }, []);
 
+  useEffect(() => {
+    // Filter patients based on search term
+    const filtered = patients.filter(patient =>
+      patient.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.phone?.includes(searchTerm) ||
+      patient.email?.toLowerCase().includes(searchTerm)
+    );
+    setFilteredPatients(filtered);
+  }, [searchTerm, patients]);
+
   const fetchPatients = async () => {
     try {
       const response = await api.get('/patients');
       setPatients(response.data);
+      setFilteredPatients(response.data);
     } catch (error) {
       console.error('Error fetching patients:', error);
       setError('Failed to fetch patients');
@@ -34,22 +42,13 @@ const Patients = ({ user }) => {
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSave = async (patientData) => {
     setError('');
-
     try {
       if (editingPatient) {
-        await api.put(`/patients/${editingPatient.id}`, formData);
+        await api.put(`/patients/${editingPatient.id}`, patientData);
       } else {
-        await api.post('/patients', formData);
+        await api.post('/patients', patientData);
       }
       
       fetchPatients();
@@ -61,21 +60,11 @@ const Patients = ({ user }) => {
 
   const handleEdit = (patient) => {
     setEditingPatient(patient);
-    setFormData({
-      user_id: patient.user_id,
-      first_name: patient.first_name,
-      last_name: patient.last_name,
-      date_of_birth: patient.date_of_birth,
-      gender: patient.gender,
-      phone: patient.phone || '',
-      address: patient.address || '',
-      emergency_contact: patient.emergency_contact || ''
-    });
     setShowAddForm(true);
   };
 
   const handleDelete = async (patientId) => {
-    if (window.confirm('Are you sure you want to delete this patient?')) {
+    if (window.confirm('Are you sure you want to delete this patient? This action cannot be undone.')) {
       try {
         await api.delete(`/patients/${patientId}`);
         fetchPatients();
@@ -85,17 +74,12 @@ const Patients = ({ user }) => {
     }
   };
 
+  const handleView = (patient) => {
+    // You can implement a detailed view modal or navigate to a detail page
+    console.log('View patient details:', patient);
+  };
+
   const resetForm = () => {
-    setFormData({
-      user_id: 1,
-      first_name: '',
-      last_name: '',
-      date_of_birth: '',
-      gender: '',
-      phone: '',
-      address: '',
-      emergency_contact: ''
-    });
     setEditingPatient(null);
     setShowAddForm(false);
     setError('');
@@ -104,208 +88,142 @@ const Patients = ({ user }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-xl">Loading patients...</div>
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="text-lg font-semibold text-gray-700">Loading patients...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="px-4 py-6 sm:px-0">
-      <div className="mb-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Patients Management</h1>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Patients Management</h1>
+            <p className="text-blue-100">Manage and monitor all patient records</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-3xl font-bold">{filteredPatients.length}</p>
+              <p className="text-blue-100 text-sm">Total Patients</p>
+            </div>
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <FiUsers className="w-8 h-8 text-white" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiSearch className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search patients..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Filter */}
+            <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <FiFilter className="w-4 h-4 mr-2" />
+              Filter
+            </button>
+
+            {/* View Toggle */}
+            <div className="flex items-center border border-gray-300 rounded-lg">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-50'} transition-colors`}
+              >
+                <FiGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-50'} transition-colors`}
+              >
+                <FiList className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Add Patient Button */}
           <button
             onClick={() => setShowAddForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+            className="flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg"
           >
-            Add New Patient
+            <FiPlus className="w-5 h-5 mr-2" />
+            Add Patient
           </button>
         </div>
       </div>
 
+      {/* Error Message */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-
-      {/* Add/Edit Patient Form */}
-      {showAddForm && (
-        <div className="bg-white shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              {editingPatient ? 'Edit Patient' : 'Add New Patient'}
-            </h3>
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">First Name</label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2 border"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2 border"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-                  <input
-                    type="date"
-                    name="date_of_birth"
-                    value={formData.date_of_birth}
-                    onChange={handleChange}
-                    required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2 border"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Gender</label>
-                  <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2 border"
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2 border"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Emergency Contact</label>
-                  <input
-                    type="text"
-                    name="emergency_contact"
-                    value={formData.emergency_contact}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2 border"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">Address</label>
-                  <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    rows={3}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2 border"
-                  />
-                </div>
-              </div>
-              <div className="mt-4 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-                >
-                  {editingPatient ? 'Update' : 'Save'} Patient
-                </button>
-              </div>
-            </form>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <FiUsers className="h-5 w-5 text-red-400" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Patients Table */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date of Birth
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Gender
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Phone
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {patients.map((patient) => (
-                <tr key={patient.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.first_name} {patient.last_name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.date_of_birth}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.gender}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.phone || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleEdit(patient)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-3"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(patient.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {patients.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              No patients found
-            </div>
+      {/* Patients Display */}
+      {filteredPatients.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+          <FiUsers className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No patients found</h3>
+          <p className="text-gray-500 mb-6">
+            {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding your first patient'}
+          </p>
+          {!searchTerm && (
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+            >
+              <FiPlus className="w-5 h-5 mr-2" />
+              Add First Patient
+            </button>
           )}
         </div>
-      </div>
+      ) : (
+        <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+          {filteredPatients.map((patient) => (
+            <PatientCard
+              key={patient.id}
+              patient={patient}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onView={handleView}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Patient Form Modal */}
+      {showAddForm && (
+        <PatientForm
+          patient={editingPatient}
+          onSave={handleSave}
+          onCancel={resetForm}
+          loading={loading}
+        />
+      )}
     </div>
   );
 };
