@@ -15,39 +15,41 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">H</span>
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-lg">H</span>
             </div>
-            <span className="ml-3 text-xl font-bold text-gray-800">HospitalMS</span>
+            <span className="ml-3 text-xl font-bold text-white">HospitalMS</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-white hover:text-blue-100 transition-colors"
           >
             <FiX className="w-6 h-6" />
           </button>
         </div>
 
-        <nav className="mt-8">
-          <div className="px-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <FiSearch className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-            </div>
+        {/* Sidebar Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
+          {/* Search */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full pl-10 pr-4 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <FiSearch className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
           </div>
 
-          <div className="mt-6 px-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Main Menu</h3>
-            <div className="mt-3 space-y-1">
+          {/* Main Menu */}
+          <div>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Main Menu</h3>
+            <div className="space-y-1">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -57,13 +59,13 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
                       setCurrentPage(item.id);
                       setSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                       currentPage === item.id
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
-                    <Icon className="w-5 h-5 mr-3" />
+                    <Icon className={`w-5 h-5 mr-3 ${currentPage === item.id ? 'text-white' : 'text-gray-400'}`} />
                     {item.label}
                   </button>
                 );
@@ -73,20 +75,21 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
         </nav>
 
         {/* User Profile */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 bg-gray-50">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-white font-semibold text-sm">
                 {user?.username?.charAt(0).toUpperCase() || 'U'}
               </span>
             </div>
             <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-gray-700">{user?.username || 'User'}</p>
+              <p className="text-sm font-medium text-gray-900">{user?.username || 'User'}</p>
               <p className="text-xs text-gray-500 capitalize">{user?.role || 'Guest'}</p>
             </div>
             <button
               onClick={onLogout}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              title="Logout"
             >
               <FiLogOut className="w-4 h-4" />
             </button>
@@ -94,25 +97,34 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="lg:ml-64">
-        {/* Top Navigation */}
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Top Navigation Header */}
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <div className="flex items-center">
+              <div className="flex items-center flex-1">
+                {/* Mobile Menu Toggle */}
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden text-gray-500 hover:text-gray-700"
+                  className="lg:hidden text-gray-500 hover:text-gray-700 mr-4"
                 >
                   <FiMenu className="w-6 h-6" />
                 </button>
-                <h1 className="ml-4 lg:ml-0 text-2xl font-bold text-gray-800 capitalize">
-                  {currentPage || 'Dashboard'}
-                </h1>
+                
+                {/* Page Title */}
+                <div className="flex items-center">
+                  <h1 className="text-2xl font-bold text-gray-900 capitalize">
+                    {currentPage || 'Dashboard'}
+                  </h1>
+                  <span className="ml-3 px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
+                    {user?.role || 'User'}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-4">
+              {/* Header Actions */}
+              <div className="flex items-center space-x-3">
                 {/* Notifications */}
                 <button className="relative p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
                   <FiBell className="w-5 h-5" />
@@ -123,25 +135,40 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
 
                 {/* Quick Actions */}
                 <div className="hidden md:flex items-center space-x-2">
-                  <button className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                    Quick Add
+                  <button className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-sm">
+                    Quick Add +
                   </button>
+                </div>
+
+                {/* User Avatar */}
+                <div className="hidden lg:flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">
+                      {user?.username?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                  <div className="hidden sm:block">
+                    <p className="text-sm font-medium text-gray-900">{user?.username || 'User'}</p>
+                    <p className="text-xs text-gray-500 capitalize">{user?.role || 'Guest'}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="p-4 sm:p-6 lg:p-8">
-          {children}
+        {/* Main Content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+          className="fixed inset-0 z-40 bg-gray-900 bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

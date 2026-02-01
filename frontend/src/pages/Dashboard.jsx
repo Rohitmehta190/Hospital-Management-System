@@ -79,12 +79,22 @@ const Dashboard = ({ user }) => {
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username}!</h1>
-            <p className="text-blue-100">Here's what's happening at your hospital today.</p>
+            <p className="text-blue-100 text-lg">Here's what's happening at your hospital today.</p>
+            <div className="mt-4 flex items-center space-x-6">
+              <div>
+                <p className="text-blue-200 text-sm">Current Time</p>
+                <p className="text-xl font-semibold">{new Date().toLocaleTimeString()}</p>
+              </div>
+              <div>
+                <p className="text-blue-200 text-sm">Today's Date</p>
+                <p className="text-xl font-semibold">{new Date().toLocaleDateString()}</p>
+              </div>
+            </div>
           </div>
-          <div className="hidden md:block">
-            <FiActivity className="w-16 h-16 text-blue-200" />
+          <div className="hidden lg:block">
+            <FiActivity className="w-20 h-20 text-blue-200 opacity-50" />
           </div>
         </div>
       </div>
@@ -103,38 +113,53 @@ const Dashboard = ({ user }) => {
       <AppointmentTable appointments={recentAppointments} />
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <button className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-            <FiUsers className="w-6 h-6 text-blue-600" />
-          </div>
-          <h3 className="font-semibold text-gray-900">Add Patient</h3>
-          <p className="text-sm text-gray-500 mt-1">Register new patient</p>
-        </button>
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button className="group relative overflow-hidden bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 hover:shadow-lg transition-all duration-300 text-center">
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <FiUsers className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Add Patient</h3>
+              <p className="text-sm text-gray-600 mt-1">Register new patient</p>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </button>
 
-        <button className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
-          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-            <FiCalendar className="w-6 h-6 text-green-600" />
-          </div>
-          <h3 className="font-semibold text-gray-900">Schedule</h3>
-          <p className="text-sm text-gray-500 mt-1">Book appointment</p>
-        </button>
+          <button className="group relative overflow-hidden bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl border border-green-200 hover:shadow-lg transition-all duration-300 text-center">
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <FiCalendar className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Schedule</h3>
+              <p className="text-sm text-gray-600 mt-1">Book appointment</p>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </button>
 
-        <button className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
-          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-            <FiTrendingUp className="w-6 h-6 text-purple-600" />
-          </div>
-          <h3 className="font-semibold text-gray-900">Reports</h3>
-          <p className="text-sm text-gray-500 mt-1">View analytics</p>
-        </button>
+          <button className="group relative overflow-hidden bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200 hover:shadow-lg transition-all duration-300 text-center">
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <FiTrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Reports</h3>
+              <p className="text-sm text-gray-600 mt-1">View analytics</p>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </button>
 
-        <button className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
-          <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-            <FiActivity className="w-6 h-6 text-orange-600" />
-          </div>
-          <h3 className="font-semibold text-gray-900">Activity</h3>
-          <p className="text-sm text-gray-500 mt-1">Recent actions</p>
-        </button>
+          <button className="group relative overflow-hidden bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200 hover:shadow-lg transition-all duration-300 text-center">
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <FiActivity className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Activity</h3>
+              <p className="text-sm text-gray-600 mt-1">Recent actions</p>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </button>
+        </div>
       </div>
     </div>
   );
