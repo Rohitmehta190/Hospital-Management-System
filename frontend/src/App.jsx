@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Patients from './pages/Patients';
+import Doctors from './pages/Doctors';
+import Appointments from './pages/Appointments';
 import Layout from './components/Layout';
 import api from './services/api';
 import './App.css';
@@ -42,9 +44,9 @@ function App() {
       case 'patients':
         return <Patients user={user} />;
       case 'doctors':
-        return <div className="p-6"><h2 className="text-2xl font-bold text-gray-900">Doctors Management</h2><p className="text-gray-600 mt-2">Doctors module coming soon...</p></div>;
+        return <Doctors user={user} />;
       case 'appointments':
-        return <div className="p-6"><h2 className="text-2xl font-bold text-gray-900">Appointments Management</h2><p className="text-gray-600 mt-2">Appointments module coming soon...</p></div>;
+        return <Appointments user={user} />;
       case 'analytics':
         return <div className="p-6"><h2 className="text-2xl font-bold text-gray-900">Analytics</h2><p className="text-gray-600 mt-2">Analytics module coming soon...</p></div>;
       case 'settings':
