@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Patients from './pages/Patients';
 import Doctors from './pages/Doctors';
 import Appointments from './pages/Appointments';
+import Analytics from './pages/Analytics';
 import Layout from './components/Layout';
 import api from './services/api';
 import './App.css';
@@ -48,7 +49,7 @@ function App() {
       case 'appointments':
         return <Appointments user={user} />;
       case 'analytics':
-        return <div className="p-6"><h2 className="text-2xl font-bold text-gray-900">Analytics</h2><p className="text-gray-600 mt-2">Analytics module coming soon...</p></div>;
+        return <Analytics user={user} />;
       case 'settings':
         return <div className="p-6"><h2 className="text-2xl font-bold text-gray-900">Settings</h2><p className="text-gray-600 mt-2">Settings module coming soon...</p></div>;
       default:
