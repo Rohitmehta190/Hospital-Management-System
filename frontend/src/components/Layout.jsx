@@ -3,6 +3,9 @@ import { FiMenu, FiX, FiHome, FiUsers, FiUser, FiCalendar, FiActivity, FiSetting
 import RoleSwitcher from './RoleSwitcher';
 import LogoutModal from './LogoutModal';
 import RoleBasedNav from './RoleBasedNav';
+import AdminDashboard from '../pages/AdminDashboard';
+import DoctorDashboard from '../pages/DoctorDashboard';
+import PatientDashboard from '../pages/PatientDashboard';
 
 const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -23,6 +26,19 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
 
   const confirmLogout = () => {
     onLogout();
+  };
+
+  const renderRoleBasedDashboard = () => {
+    switch (currentRole) {
+      case 'admin':
+        return <AdminDashboard user={user} />;
+      case 'doctor':
+        return <DoctorDashboard user={user} />;
+      case 'patient':
+        return <PatientDashboard user={user} />;
+      default:
+        return <AdminDashboard user={user} />;
+    }
   };
 
   return (
@@ -148,7 +164,7 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
         {/* Main Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
-            {children}
+            {currentPage === 'dashboard' ? renderRoleBasedDashboard() : children}
           </div>
         </main>
       </div>

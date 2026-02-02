@@ -6,6 +6,11 @@ import Doctors from './pages/Doctors';
 import Appointments from './pages/Appointments';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import AdminDashboard from './pages/AdminDashboard';
+import DoctorDashboard from './pages/DoctorDashboard';
+import PatientDashboard from './pages/PatientDashboard';
+import DoctorPatients from './pages/DoctorPatients';
+import PatientAppointments from './pages/PatientAppointments';
 import Layout from './components/Layout';
 import api from './services/api';
 import './App.css';
@@ -39,20 +44,36 @@ function App() {
     setCurrentPage('dashboard');
   };
 
-  const renderPage = () => {
+    const renderPage = () => {
+    const userRole = user?.role || 'admin';
+    
     switch (currentPage) {
       case 'dashboard':
+        // Return role-specific dashboard
+        if (userRole === 'admin') return <AdminDashboard user={user} />;
+        if (userRole === 'doctor') return <DoctorDashboard user={user} />;
+        if (userRole === 'patient') return <PatientDashboard user={user} />;
         return <Dashboard user={user} />;
+      
       case 'patients':
+        // Return role-specific patients page
+        if (userRole === 'doctor') return <DoctorPatients user={user} />;
         return <Patients user={user} />;
+      
+      case 'appointments':
+        // Return role-specific appointments page
+        if (userRole === 'patient') return <PatientAppointments user={user} />;
+        return <Appointments user={user} />;
+      
       case 'doctors':
         return <Doctors user={user} />;
-      case 'appointments':
-        return <Appointments user={user} />;
+      
       case 'analytics':
         return <Analytics user={user} />;
+      
       case 'settings':
         return <Settings user={user} onLogout={handleLogout} />;
+      
       default:
         return <Dashboard user={user} />;
     }
