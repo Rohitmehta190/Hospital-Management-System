@@ -1,18 +1,29 @@
 import React from 'react';
 import { FiMenu, FiX, FiHome, FiUsers, FiUser, FiCalendar, FiActivity, FiSettings, FiLogOut, FiBell, FiSearch } from 'react-icons/fi';
+import RoleSwitcher from './RoleSwitcher';
+import LogoutModal from './LogoutModal';
+import RoleBasedNav from './RoleBasedNav';
 
 const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState(3);
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const [currentRole, setCurrentRole] = React.useState(user?.role || 'admin');
 
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: FiHome },
-    { id: 'patients', label: 'Patients', icon: FiUsers },
-    { id: 'doctors', label: 'Doctors', icon: FiUser },
-    { id: 'appointments', label: 'Appointments', icon: FiCalendar },
-    { id: 'analytics', label: 'Analytics', icon: FiActivity },
-    { id: 'settings', label: 'Settings', icon: FiSettings },
-  ];
+  const handleRoleSwitch = (newRole) => {
+    setCurrentRole(newRole);
+    // Update user role in localStorage
+    const updatedUser = { ...user, role: newRole };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    onLogout();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -46,32 +57,12 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
             <FiSearch className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
           </div>
 
-          {/* Main Menu */}
-          <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Main Menu</h3>
-            <div className="space-y-1">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setCurrentPage(item.id);
-                      setSidebarOpen(false);
-                    }}
-                    className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      currentPage === item.id
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className={`w-5 h-5 mr-3 ${currentPage === item.id ? 'text-white' : 'text-gray-400'}`} />
-                    {item.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {/* Role-based Navigation */}
+          <RoleBasedNav
+            currentRole={currentRole}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </nav>
 
         {/* User Profile */}
@@ -140,17 +131,14 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
                   </button>
                 </div>
 
-                {/* User Avatar */}
+                {/* User Avatar & Role Switcher */}
                 <div className="hidden lg:flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">
-                      {user?.username?.charAt(0).toUpperCase() || 'U'}
-                    </span>
-                  </div>
-                  <div className="hidden sm:block">
-                    <p className="text-sm font-medium text-gray-900">{user?.username || 'User'}</p>
-                    <p className="text-xs text-gray-500 capitalize">{user?.role || 'Guest'}</p>
-                  </div>
+                  <RoleSwitcher
+                    user={user}
+                    currentRole={currentRole}
+                    onRoleSwitch={handleRoleSwitch}
+                    onLogout={handleLogout}
+                  />
                 </div>
               </div>
             </div>
@@ -172,6 +160,14 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Logout Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+        user={user}
+      />
     </div>
   );
 };
