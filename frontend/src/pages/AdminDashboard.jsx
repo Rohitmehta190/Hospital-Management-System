@@ -26,8 +26,8 @@ const AdminDashboard = ({ user }) => {
     });
 
     setRecentActivities([
-      { id: 1, type: 'user', message: 'New doctor registered: Dr. Sarah Johnson', time: '2 minutes ago', icon: FiUser, color: 'text-blue-600' },
-      { id: 2, type: 'appointment', message: 'Emergency appointment scheduled', time: '5 minutes ago', icon: FiCalendar, color: 'text-green-600' },
+      { id: 1, type: 'user', message: 'New doctor registered: Dr. Ashok Reddy', time: '2 minutes ago', icon: FiUser, color: 'text-blue-600' },
+      { id: 2, type: 'appointment', message: 'Emergency appointment scheduled for Rahul Sharma', time: '5 minutes ago', icon: FiCalendar, color: 'text-green-600' },
       { id: 3, type: 'alert', message: 'System backup completed successfully', time: '15 minutes ago', icon: FiCheckCircle, color: 'text-emerald-600' },
       { id: 4, type: 'system', message: 'Database optimization in progress', time: '1 hour ago', icon: FiDatabase, color: 'text-purple-600' }
     ]);

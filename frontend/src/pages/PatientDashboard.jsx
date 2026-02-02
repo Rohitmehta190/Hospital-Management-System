@@ -19,15 +19,15 @@ const PatientDashboard = ({ user }) => {
   useEffect(() => {
     // Simulate data fetching
     setUpcomingAppointments([
-      { id: 1, date: 'Tomorrow', time: '10:00 AM', doctor: 'Dr. Sarah Johnson', type: 'Regular Checkup', department: 'Cardiology' },
-      { id: 2, date: 'Next Week', time: '2:30 PM', doctor: 'Dr. Michael Brown', type: 'Follow-up', department: 'Internal Medicine' },
-      { id: 3, date: 'Next Month', time: '11:15 AM', doctor: 'Dr. Emily Davis', type: 'Annual Physical', department: 'General Practice' }
+      { id: 1, date: 'Tomorrow', time: '10:00 AM', doctor: 'Dr. Ashok Reddy', type: 'Regular Checkup', department: 'Cardiology' },
+      { id: 2, date: 'Next Week', time: '2:30 PM', doctor: 'Dr. Anjali Gupta', type: 'Follow-up', department: 'Internal Medicine' },
+      { id: 3, date: 'Next Month', time: '11:15 AM', doctor: 'Dr. Priya Nair', type: 'Annual Physical', department: 'General Practice' }
     ]);
 
     setMedicalHistory([
-      { id: 1, date: '2024-01-15', diagnosis: 'Hypertension', doctor: 'Dr. Sarah Johnson', treatment: 'Medication prescribed', status: 'resolved' },
-      { id: 2, date: '2023-12-20', diagnosis: 'Seasonal Flu', doctor: 'Dr. Michael Brown', treatment: 'Rest and fluids', status: 'resolved' },
-      { id: 3, date: '2023-11-10', diagnosis: 'Annual Checkup', doctor: 'Dr. Emily Davis', treatment: 'Routine examination', status: 'completed' }
+      { id: 1, date: '2024-01-15', diagnosis: 'Hypertension', doctor: 'Dr. Ashok Reddy', treatment: 'Medication prescribed', status: 'resolved' },
+      { id: 2, date: '2023-12-20', diagnosis: 'Seasonal Flu', doctor: 'Dr. Anjali Gupta', treatment: 'Rest and fluids', status: 'resolved' },
+      { id: 3, date: '2023-11-10', diagnosis: 'Annual Checkup', doctor: 'Dr. Priya Nair', treatment: 'Routine examination', status: 'completed' }
     ]);
 
     setMedications([
@@ -85,7 +85,7 @@ const PatientDashboard = ({ user }) => {
               </div>
               <div className="flex items-center space-x-2">
                 <FiUser className="w-5 h-5" />
-                <span className="text-sm">Primary Care: Dr. Sarah Johnson</span>
+                <span className="text-sm">Primary Care: Dr. Ashok Reddy</span>
               </div>
             </div>
           </div>

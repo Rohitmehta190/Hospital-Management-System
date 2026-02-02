@@ -27,23 +27,23 @@ const DoctorDashboard = ({ user }) => {
     });
 
     setTodaySchedule([
-      { id: 1, time: '09:00 AM', patient: 'John Smith', type: 'Regular Checkup', status: 'completed' },
-      { id: 2, time: '10:00 AM', patient: 'Sarah Johnson', type: 'Follow-up', status: 'in-progress' },
-      { id: 3, time: '11:00 AM', patient: 'Michael Brown', type: 'Consultation', status: 'upcoming' },
-      { id: 4, time: '02:00 PM', patient: 'Emily Davis', type: 'Emergency', status: 'upcoming' },
-      { id: 5, time: '03:00 PM', patient: 'Robert Wilson', type: 'Surgery Review', status: 'upcoming' }
+      { id: 1, time: '09:00 AM', patient: 'Rahul Sharma', type: 'Regular Checkup', status: 'completed' },
+      { id: 2, time: '10:00 AM', patient: 'Priya Patel', type: 'Follow-up', status: 'in-progress' },
+      { id: 3, time: '11:00 AM', patient: 'Amit Kumar', type: 'Consultation', status: 'upcoming' },
+      { id: 4, time: '02:00 PM', patient: 'Sunita Devi', type: 'Emergency', status: 'upcoming' },
+      { id: 5, time: '03:00 PM', patient: 'Ramesh Patel', type: 'Surgery Review', status: 'upcoming' }
     ]);
 
     setRecentPatients([
-      { id: 1, name: 'John Smith', age: 45, lastVisit: '2 days ago', condition: 'Hypertension', avatar: 'JS' },
-      { id: 2, name: 'Sarah Johnson', age: 32, lastVisit: '1 week ago', condition: 'Diabetes', avatar: 'SJ' },
-      { id: 3, name: 'Michael Brown', age: 58, lastVisit: '3 days ago', condition: 'Heart Disease', avatar: 'MB' }
+      { id: 1, name: 'Rahul Sharma', age: 45, lastVisit: '2 days ago', condition: 'Hypertension', avatar: 'RS' },
+      { id: 2, name: 'Priya Patel', age: 32, lastVisit: '1 week ago', condition: 'Diabetes', avatar: 'PP' },
+      { id: 3, name: 'Amit Kumar', age: 58, lastVisit: '3 days ago', condition: 'Heart Disease', avatar: 'AK' }
     ]);
 
     setNotifications([
-      { id: 1, type: 'urgent', message: 'Emergency appointment request', time: '5 min ago' },
-      { id: 2, type: 'info', message: 'Lab results ready for John Smith', time: '1 hour ago' },
-      { id: 3, type: 'reminder', message: 'Complete medical reports for 3 patients', time: '2 hours ago' }
+      { id: 1, type: 'urgent', message: 'Emergency appointment request from Amit Kumar', time: '5 min ago' },
+      { id: 2, type: 'info', message: 'Lab results ready for Rahul Sharma', time: '1 hour ago' },
+      { id: 3, type: 'reminder', message: 'Complete medical reports for Priya Patel', time: '2 hours ago' }
     ]);
   }, []);
 
