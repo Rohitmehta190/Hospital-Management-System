@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiUser, FiHeart, FiActivity, FiFileText, FiClock, FiAlertCircle, FiCheckCircle, FiVideo, FiMessageSquare, FiDownload, FiTrendingUp, FiPill, FiThermometer, FiActivity as FiActivityIcon } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiHeart, FiActivity, FiFileText, FiClock, FiAlertCircle, FiCheckCircle, FiVideo, FiMessageSquare, FiDownload, FiTrendingUp, FiActivity as FiActivityIcon, FiThermometer } from 'react-icons/fi';
 
 const PatientDashboard = ({ user }) => {
   const [healthStats, setHealthStats] = useState({
@@ -234,7 +234,7 @@ const PatientDashboard = ({ user }) => {
         {/* Current Medications */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-            <FiPill className="w-5 h-5 mr-2 text-purple-600" />
+            <FiActivity className="w-5 h-5 mr-2 text-purple-600" />
             Current Medications
           </h3>
           <div className="space-y-3">
@@ -242,7 +242,7 @@ const PatientDashboard = ({ user }) => {
               <div key={medication.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <FiPill className="w-5 h-5 text-purple-600" />
+                    <FiActivity className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{medication.name}</p>
