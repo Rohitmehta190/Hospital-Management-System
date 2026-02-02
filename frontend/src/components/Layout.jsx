@@ -6,11 +6,13 @@ import RoleBasedNav from './RoleBasedNav';
 import AdminDashboard from '../pages/AdminDashboard';
 import DoctorDashboard from '../pages/DoctorDashboard';
 import PatientDashboard from '../pages/PatientDashboard';
+import NotificationBar from './NotificationBar';
+import QuickAddModal from './QuickAddModal';
 
 const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [notifications, setNotifications] = React.useState(3);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const [showQuickAddModal, setShowQuickAddModal] = React.useState(false);
   const [currentRole, setCurrentRole] = React.useState(user?.role || 'admin');
 
   const handleRoleSwitch = (newRole) => {
@@ -79,6 +81,16 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
           />
+
+          {/* Mobile Quick Add Button */}
+          <div className="md:hidden">
+            <button 
+              onClick={() => setShowQuickAddModal(true)}
+              className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+            >
+              Quick Add +
+            </button>
+          </div>
         </nav>
 
         {/* User Profile */}
@@ -133,16 +145,14 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
               {/* Header Actions */}
               <div className="flex items-center space-x-3">
                 {/* Notifications */}
-                <button className="relative p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
-                  <FiBell className="w-5 h-5" />
-                  {notifications > 0 && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                  )}
-                </button>
+                <NotificationBar user={user} />
 
                 {/* Quick Actions */}
                 <div className="hidden md:flex items-center space-x-2">
-                  <button className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-sm">
+                  <button 
+                    onClick={() => setShowQuickAddModal(true)}
+                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-sm"
+                  >
                     Quick Add +
                   </button>
                 </div>
@@ -182,6 +192,13 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
         onConfirm={confirmLogout}
+        user={user}
+      />
+
+      {/* Quick Add Modal */}
+      <QuickAddModal
+        isOpen={showQuickAddModal}
+        onClose={() => setShowQuickAddModal(false)}
         user={user}
       />
     </div>
