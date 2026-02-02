@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiDownload, FiFilter, FiCalendar, FiFileText, FiTrendingUp, FiUsers, FiClock, FiDollarSign } from 'react-icons/fi';
+import { FiDownload, FiFilter, FiCalendar, FiFileText, FiTrendingUp, FiUsers, FiClock, FiDollarSign, FiTarget } from 'react-icons/fi';
 
 const AnalyticsReports = ({ patients, doctors, appointments }) => {
   const [selectedReport, setSelectedReport] = useState('monthly');
