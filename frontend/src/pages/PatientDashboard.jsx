@@ -15,6 +15,166 @@ const PatientDashboard = ({ user }) => {
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [medications, setMedications] = useState([]);
   const [healthTips, setHealthTips] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
+
+  // Button handlers
+  const handleBookAppointment = () => {
+    setModalType('bookAppointment');
+    setShowModal(true);
+  };
+
+  const handleViewRecords = () => {
+    setModalType('viewRecords');
+    setShowModal(true);
+  };
+
+  const handleMessageDoctor = () => {
+    setModalType('messageDoctor');
+    setShowModal(true);
+  };
+
+  const handleDownloadReports = () => {
+    setModalType('downloadReports');
+    setShowModal(true);
+  };
+
+  const handleJoinVideoCall = (appointmentId) => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      alert(`Starting video call for appointment ${appointmentId}...`);
+    }, 1000);
+  };
+
+  const handleRequestMedicationRefill = (medId) => {
+    alert(`Medication refill requested for medication ID: ${medId}`);
+  };
+
+  const renderModal = () => {
+    if (!showModal) return null;
+
+    const modalContent = {
+      bookAppointment: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Book New Appointment</h3>
+          <div className="space-y-4">
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="">Select Doctor</option>
+              <option value="1">Dr. Ashok Reddy - Cardiology</option>
+              <option value="2">Dr. Anjali Gupta - General Medicine</option>
+              <option value="3">Dr. Priya Nair - General Practice</option>
+            </select>
+            <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="">Select Time</option>
+              <option value="09:00">9:00 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="14:00">2:00 PM</option>
+            </select>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="">Appointment Type</option>
+              <option value="regular">Regular Checkup</option>
+              <option value="follow-up">Follow-up</option>
+              <option value="emergency">Emergency</option>
+            </select>
+            <div className="flex space-x-3">
+              <button onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg">Cancel</button>
+              <button onClick={() => { setShowModal(false); alert('Appointment booked successfully!'); }} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+      ),
+      viewRecords: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Medical Records</h3>
+          <div className="space-y-3">
+            {medicalHistory.map((record) => (
+              <div key={record.id} className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-medium">{record.diagnosis}</p>
+                    <p className="text-sm text-gray-600">{record.treatment}</p>
+                    <p className="text-xs text-gray-500">{record.date} • {record.doctor}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    record.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                    record.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {record.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4">
+            <button onClick={() => setShowModal(false)} className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg">Close</button>
+          </div>
+        </div>
+      ),
+      messageDoctor: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Message Doctor</h3>
+          <div className="space-y-4">
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="">Select Doctor</option>
+              <option value="1">Dr. Ashok Reddy</option>
+              <option value="2">Dr. Anjali Gupta</option>
+              <option value="3">Dr. Priya Nair</option>
+            </select>
+            <input type="text" placeholder="Subject" className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+            <textarea placeholder="Type your message here..." className="w-full px-3 py-2 border border-gray-300 rounded-lg h-32"></textarea>
+            <div className="flex space-x-3">
+              <button onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg">Cancel</button>
+              <button onClick={() => { setShowModal(false); alert('Message sent successfully!'); }} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg">Send Message</button>
+            </div>
+          </div>
+        </div>
+      ),
+      downloadReports: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Download Reports</h3>
+          <div className="space-y-3">
+            <label className="flex items-center space-x-2">
+              <input type="checkbox" className="rounded" />
+              <span>Complete Medical History</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input type="checkbox" className="rounded" />
+              <span>Lab Results</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input type="checkbox" className="rounded" />
+              <span>Prescription History</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input type="checkbox" className="rounded" />
+              <span>Immunization Records</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input type="checkbox" className="rounded" />
+              <span>Allergy Information</span>
+            </label>
+          </div>
+          <div className="mt-4 flex space-x-3">
+            <button onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg">Cancel</button>
+            <button onClick={() => { setShowModal(false); alert('Reports downloaded successfully!'); }} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg">Download</button>
+          </div>
+        </div>
+      )
+    };
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+          {modalContent[modalType]}
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     // Simulate data fetching
@@ -44,10 +204,10 @@ const PatientDashboard = ({ user }) => {
   }, []);
 
   const quickActions = [
-    { id: 1, title: 'Book Appointment', icon: FiCalendar, color: 'from-blue-500 to-blue-600', description: 'Schedule new appointment' },
-    { id: 2, title: 'Video Consultation', icon: FiVideo, color: 'from-green-500 to-green-600', description: 'Start video call with doctor' },
-    { id: 3, title: 'View Records', icon: FiFileText, color: 'from-purple-500 to-purple-600', description: 'Access medical records' },
-    { id: 4, title: 'Message Doctor', icon: FiMessageSquare, color: 'from-orange-500 to-orange-600', description: 'Send message to doctor' }
+    { id: 1, title: 'Book Appointment', icon: FiCalendar, color: 'from-blue-500 to-blue-600', description: 'Schedule new appointment', onClick: handleBookAppointment },
+    { id: 2, title: 'Video Consultation', icon: FiVideo, color: 'from-green-500 to-green-600', description: 'Start video call with doctor', onClick: handleBookAppointment },
+    { id: 3, title: 'View Records', icon: FiFileText, color: 'from-purple-500 to-purple-600', description: 'Access medical records', onClick: handleViewRecords },
+    { id: 4, title: 'Message Doctor', icon: FiMessageSquare, color: 'from-orange-500 to-orange-600', description: 'Send message to doctor', onClick: handleMessageDoctor }
   ];
 
   const getHealthStatus = (value, type) => {
@@ -67,7 +227,8 @@ const PatientDashboard = ({ user }) => {
   const bpStatus = getHealthStatus(healthStats.bloodPressure, 'bloodPressure');
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl p-8 text-white shadow-xl">
         <div className="flex items-center justify-between">
@@ -184,6 +345,7 @@ const PatientDashboard = ({ user }) => {
                 return (
                   <button
                     key={action.id}
+                    onClick={action.onClick}
                     className={`w-full flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r ${action.color} text-white hover:shadow-lg transition-all duration-300 transform hover:scale-105`}
                   >
                     <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
@@ -222,6 +384,13 @@ const PatientDashboard = ({ user }) => {
                   <div className="text-right">
                     <p className="font-semibold text-gray-900">{appointment.date}</p>
                     <p className="text-sm text-gray-600">{appointment.time}</p>
+                    <button 
+                      onClick={() => handleJoinVideoCall(appointment.id)}
+                      disabled={loading}
+                      className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {loading ? 'Joining...' : 'Join Call'}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -252,6 +421,12 @@ const PatientDashboard = ({ user }) => {
                 <div className="text-right">
                   <p className="text-xs text-gray-500">Remaining</p>
                   <p className="text-sm font-semibold text-gray-900">{medication.remaining} pills</p>
+                  <button 
+                    onClick={() => handleRequestMedicationRefill(medication.id)}
+                    className="mt-1 px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700"
+                  >
+                    Refill
+                  </button>
                 </div>
               </div>
             ))}
@@ -281,7 +456,7 @@ const PatientDashboard = ({ user }) => {
                   <p className="text-sm text-gray-600">{record.doctor} • {record.date}</p>
                   <p className="text-xs text-gray-500 mt-1">{record.treatment}</p>
                 </div>
-                <button className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
+                <button onClick={handleDownloadReports} className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
                   <FiDownload className="w-4 h-4" />
                 </button>
               </div>
@@ -312,6 +487,10 @@ const PatientDashboard = ({ user }) => {
         </div>
       </div>
     </div>
+
+      {/* Modal */}
+      {renderModal()}
+    </>
   );
 };
 

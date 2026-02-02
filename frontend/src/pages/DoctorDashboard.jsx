@@ -14,6 +14,141 @@ const DoctorDashboard = ({ user }) => {
   const [todaySchedule, setTodaySchedule] = useState([]);
   const [recentPatients, setRecentPatients] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
+
+  // Button handlers
+  const handleStartConsultation = () => {
+    setModalType('consultation');
+    setShowModal(true);
+  };
+
+  const handleWritePrescription = () => {
+    setModalType('prescription');
+    setShowModal(true);
+  };
+
+  const handleViewSchedule = () => {
+    setModalType('schedule');
+    setShowModal(true);
+  };
+
+  const handlePatientMessages = () => {
+    setModalType('messages');
+    setShowModal(true);
+  };
+
+  const handleViewPatientDetails = (patientId) => {
+    alert(`Opening patient details for patient ID: ${patientId}`);
+  };
+
+  const handleStartAppointment = (appointmentId) => {
+    setLoading(true);
+    setTimeout(() => {
+      setTodaySchedule(prev => 
+        prev.map(apt => 
+          apt.id === appointmentId 
+            ? { ...apt, status: 'in-progress' }
+            : apt
+        )
+      );
+      setLoading(false);
+      alert('Consultation started!');
+    }, 1000);
+  };
+
+  const renderModal = () => {
+    if (!showModal) return null;
+
+    const modalContent = {
+      consultation: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Start Video Consultation</h3>
+          <div className="space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">Starting video consultation with next available patient...</p>
+            </div>
+            <div className="flex space-x-3">
+              <button onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg">Cancel</button>
+              <button onClick={() => { setShowModal(false); alert('Video consultation started!'); }} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg">Start Call</button>
+            </div>
+          </div>
+        </div>
+      ),
+      prescription: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Write Prescription</h3>
+          <div className="space-y-4">
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="">Select Patient</option>
+              <option value="1">Rahul Sharma</option>
+              <option value="2">Priya Patel</option>
+              <option value="3">Amit Kumar</option>
+            </select>
+            <textarea placeholder="Prescription details..." className="w-full px-3 py-2 border border-gray-300 rounded-lg h-32"></textarea>
+            <div className="flex space-x-3">
+              <button onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg">Cancel</button>
+              <button onClick={() => { setShowModal(false); alert('Prescription saved!'); }} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg">Save Prescription</button>
+            </div>
+          </div>
+        </div>
+      ),
+      schedule: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">View Schedule</h3>
+          <div className="space-y-3">
+            {todaySchedule.map((appointment) => (
+              <div key={appointment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium">{appointment.patient}</p>
+                  <p className="text-sm text-gray-600">{appointment.time} - {appointment.type}</p>
+                </div>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  appointment.status === 'completed' ? 'bg-green-100 text-green-800' :
+                  appointment.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {appointment.status}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4">
+            <button onClick={() => setShowModal(false)} className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg">Close</button>
+          </div>
+        </div>
+      ),
+      messages: (
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Patient Messages</h3>
+          <div className="space-y-3">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="font-medium">Rahul Sharma</p>
+              <p className="text-sm text-gray-600">"Doctor, I need to reschedule my appointment..."</p>
+              <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="font-medium">Priya Patel</p>
+              <p className="text-sm text-gray-600">"Thank you for the consultation yesterday!"</p>
+              <p className="text-xs text-gray-500 mt-1">1 day ago</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <button onClick={() => setShowModal(false)} className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg">Close</button>
+          </div>
+        </div>
+      )
+    };
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+          {modalContent[modalType]}
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     // Simulate data fetching
@@ -48,10 +183,10 @@ const DoctorDashboard = ({ user }) => {
   }, []);
 
   const quickActions = [
-    { id: 1, title: 'Start Consultation', icon: FiVideo, color: 'from-blue-500 to-blue-600', description: 'Begin video call' },
-    { id: 2, title: 'Write Prescription', icon: FiFileText, color: 'from-green-500 to-green-600', description: 'Create prescription' },
-    { id: 3, title: 'View Schedule', icon: FiCalendar, color: 'from-purple-500 to-purple-600', description: 'Check appointments' },
-    { id: 4, title: 'Patient Messages', icon: FiMessageSquare, color: 'from-orange-500 to-orange-600', description: 'Read messages' }
+    { id: 1, title: 'Start Consultation', icon: FiVideo, color: 'from-blue-500 to-blue-600', description: 'Begin video call', onClick: handleStartConsultation },
+    { id: 2, title: 'Write Prescription', icon: FiFileText, color: 'from-green-500 to-green-600', description: 'Create prescription', onClick: handleWritePrescription },
+    { id: 3, title: 'View Schedule', icon: FiCalendar, color: 'from-purple-500 to-purple-600', description: 'Check appointments', onClick: handleViewSchedule },
+    { id: 4, title: 'Patient Messages', icon: FiMessageSquare, color: 'from-orange-500 to-orange-600', description: 'Read messages', onClick: handlePatientMessages }
   ];
 
   const getStatusColor = (status) => {
@@ -73,7 +208,8 @@ const DoctorDashboard = ({ user }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-8 text-white shadow-xl">
         <div className="flex items-center justify-between">
@@ -198,8 +334,16 @@ const DoctorDashboard = ({ user }) => {
                       {appointment.status}
                     </span>
                     {appointment.status === 'upcoming' && (
-                      <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                        <FiVideo className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleStartAppointment(appointment.id)}
+                        disabled={loading}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {loading ? (
+                          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <FiVideo className="w-4 h-4" />
+                        )}
                       </button>
                     )}
                   </div>
@@ -222,6 +366,7 @@ const DoctorDashboard = ({ user }) => {
                 return (
                   <button
                     key={action.id}
+                    onClick={action.onClick}
                     className={`w-full flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r ${action.color} text-white hover:shadow-lg transition-all duration-300 transform hover:scale-105`}
                   >
                     <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
@@ -248,7 +393,7 @@ const DoctorDashboard = ({ user }) => {
           </h3>
           <div className="space-y-3">
             {recentPatients.map((patient) => (
-              <div key={patient.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div key={patient.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => handleViewPatientDetails(patient.id)}>
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                     <span className="text-white font-bold">{patient.avatar}</span>
@@ -289,6 +434,10 @@ const DoctorDashboard = ({ user }) => {
         </div>
       </div>
     </div>
+
+      {/* Modal */}
+      {renderModal()}
+    </>
   );
 };
 
