@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Patients from './pages/Patients';
@@ -16,7 +17,6 @@ import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [currentPage, setCurrentPage] = useState('dashboard');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,14 +57,12 @@ function App() {
       setUser(null);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      setCurrentPage('dashboard');
     } catch (error) {
       console.error('Logout error:', error);
       // Force logout even if Firebase logout fails
       setUser(null);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      setCurrentPage('dashboard');
     }
   };
 
@@ -79,54 +77,39 @@ function App() {
     );
   }
 
-  if (!user) {
-    return <Login onLogin={handleLogin} />;
-  }
-
-    const renderPage = () => {
+  const renderDashboard = () => {
     const userRole = user?.role || 'admin';
-    
-    switch (currentPage) {
-      case 'dashboard':
-        // Return role-specific dashboard
-        if (userRole === 'admin') return <AdminDashboard user={user} />;
-        if (userRole === 'doctor') return <Dashboard user={user} />;
-        if (userRole === 'patient') return <Dashboard user={user} />;
-        return <Dashboard user={user} />;
-      
-      case 'patients':
-        // Return role-specific patients page
-        if (userRole === 'doctor') return <DoctorPatients user={user} />;
-        return <Patients user={user} />;
-      
-      case 'appointments':
-        // Return role-specific appointments page
-        if (userRole === 'patient') return <PatientAppointments user={user} />;
-        return <Appointments user={user} />;
-      
-      case 'doctors':
-        return <Doctors user={user} />;
-      
-      case 'analytics':
-        return <Analytics user={user} />;
-      
-      case 'settings':
-        return <Settings user={user} onLogout={handleLogout} />;
-      
-      default:
-        return <Dashboard user={user} />;
-    }
+    if (userRole === 'admin') return <AdminDashboard user={user} />;
+    if (userRole === 'doctor') return <Dashboard user={user} />;
+    if (userRole === 'patient') return <Dashboard user={user} />;
+    return <Dashboard user={user} />;
+  };
+
+  const renderPatients = () => {
+    const userRole = user?.role || 'admin';
+    if (userRole === 'doctor') return <DoctorPatients user={user} />;
+    return <Patients user={user} />;
+  };
+
+  const renderAppointments = () => {
+    const userRole = user?.role || 'admin';
+    if (userRole === 'patient') return <PatientAppointments user={user} />;
+    return <Appointments user={user} />;
   };
 
   return (
-    <Layout 
-      user={user} 
-      currentPage={currentPage} 
-      setCurrentPage={setCurrentPage} 
-      onLogout={handleLogout}
-    >
-      {renderPage()}
-    </Layout>
+    <Router>
+      <Routes>
+        <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to="/" />} />
+        <Route path="/" element={user ? <Layout user={user} onLogout={handleLogout}>{renderDashboard()}</Layout> : <Navigate to="/login" />} />
+        <Route path="/patients" element={user ? <Layout user={user} onLogout={handleLogout}>{renderPatients()}</Layout> : <Navigate to="/login" />} />
+        <Route path="/doctors" element={user ? <Layout user={user} onLogout={handleLogout}><Doctors user={user} /></Layout> : <Navigate to="/login" />} />
+        <Route path="/appointments" element={user ? <Layout user={user} onLogout={handleLogout}>{renderAppointments()}</Layout> : <Navigate to="/login" />} />
+        <Route path="/analytics" element={user ? <Layout user={user} onLogout={handleLogout}><Analytics user={user} /></Layout> : <Navigate to="/login" />} />
+        <Route path="/settings" element={user ? <Layout user={user} onLogout={handleLogout}><Settings user={user} onLogout={handleLogout} /></Layout> : <Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} />
+      </Routes>
+    </Router>
   );
 }
 

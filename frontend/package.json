@@ -2,6 +2,7 @@
   "name": "hospital-management-frontend",
   "version": "1.0.0",
   "description": "Hospital Management System Frontend",
+  "homepage": ".",
   "main": "src/index.js",
   "scripts": {
     "start": "react-scripts start",

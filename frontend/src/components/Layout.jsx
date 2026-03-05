@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, FiHome, FiUsers, FiUser, FiCalendar, FiActivity, FiSettings, FiLogOut, FiBell, FiSearch } from 'react-icons/fi';
 import RoleSwitcher from './RoleSwitcher';
 import LogoutModal from './LogoutModal';
@@ -8,7 +9,9 @@ import Dashboard from '../pages/Dashboard';
 import NotificationBar from './NotificationBar';
 import QuickAddModal from './QuickAddModal';
 
-const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
+const Layout = ({ children, user, onLogout }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
   const [showQuickAddModal, setShowQuickAddModal] = React.useState(false);
@@ -27,6 +30,12 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
 
   const confirmLogout = () => {
     onLogout();
+  };
+
+  const getCurrentPage = () => {
+    const path = location.pathname;
+    if (path === '/' || path === '/login') return 'dashboard';
+    return path.replace('/', '') || 'dashboard';
   };
 
   const renderRoleBasedDashboard = () => {
@@ -77,8 +86,8 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
           {/* Role-based Navigation */}
           <RoleBasedNav
             currentRole={currentRole}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            currentPage={getCurrentPage()}
+            setCurrentPage={(page) => navigate(page === 'dashboard' ? '/' : `/${page}`)}
           />
 
           {/* Mobile Quick Add Button */}
@@ -133,7 +142,7 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
                 {/* Page Title */}
                 <div className="flex items-center">
                   <h1 className="text-2xl font-bold text-gray-900 capitalize">
-                    {currentPage || 'Dashboard'}
+                    {getCurrentPage() || 'Dashboard'}
                   </h1>
                   <span className="ml-3 px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
                     {user?.role || 'User'}
@@ -173,7 +182,7 @@ const Layout = ({ children, user, currentPage, setCurrentPage, onLogout }) => {
         {/* Main Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
-            {currentPage === 'dashboard' ? renderRoleBasedDashboard() : children}
+            {getCurrentPage() === 'dashboard' ? renderRoleBasedDashboard() : children}
           </div>
         </main>
       </div>
