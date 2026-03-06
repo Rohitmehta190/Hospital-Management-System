@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { patientsAPI, doctorsAPI, appointmentsAPI } from '../services/api';
 import DashboardCards from '../components/DashboardCards';
 import AppointmentTable from '../components/AppointmentTable';
 import { AppointmentChart, PatientGrowthChart, DepartmentStats } from '../components/Charts';
@@ -22,34 +22,40 @@ const Dashboard = ({ user }) => {
   const fetchDashboardData = async () => {
     try {
       const [patientsResponse, doctorsResponse, appointmentsResponse] = await Promise.all([
-        api.get('/patients'),
-        api.get('/doctors'),
-        api.get('/appointments')
+        patientsAPI.getAll(),
+        doctorsAPI.getAll(),
+        appointmentsAPI.getAll()
       ]);
 
-      const patients = patientsResponse.data;
-      const doctors = doctorsResponse.data;
-      const appointments = appointmentsResponse.data;
+      const patients = patientsResponse.data || {};
+      const doctors = doctorsResponse.data || {};
+      const appointments = appointmentsResponse.data || {};
+
+      // Convert Firebase objects to arrays
+      const patientsArray = Object.values(patients);
+      const doctorsArray = Object.values(doctors);
+      const appointmentsArray = Object.values(appointments);
 
       const today = new Date().toISOString().split('T')[0];
-      const todayAppointments = appointments.filter(apt => 
-        apt.appointment_date.startsWith(today)
+      const todayAppointments = appointmentsArray.filter(apt => 
+        apt.appointment_date && apt.appointment_date.startsWith(today)
       );
-      const pendingAppointments = appointments.filter(apt => 
+      const pendingAppointments = appointmentsArray.filter(apt => 
         apt.status === 'scheduled'
       );
 
       setStats({
-        totalPatients: patients.length,
-        totalDoctors: doctors.length,
+        totalPatients: patientsArray.length,
+        totalDoctors: doctorsArray.length,
         todayAppointments: todayAppointments.length,
         pendingAppointments: pendingAppointments.length
       });
 
-      // Get recent appointments with priority
-      const recent = appointments
-        .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date))
-        .slice(0, 8)
+      // Sort appointments by date and get recent ones
+      const sortedAppointments = appointmentsArray.sort((a, b) => 
+        new Date(b.appointment_date || '1970-01-01') - new Date(a.appointment_date || '1970-01-01')
+      );
+      const recent = sortedAppointments.slice(0, 5)
         .map(apt => ({
           ...apt,
           priority: Math.random() > 0.7 ? 'high' : Math.random() > 0.4 ? 'medium' : 'low'
