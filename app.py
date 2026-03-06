@@ -20,16 +20,34 @@ def create_app():
             'message': 'Hospital Management System API is running'
         })
     
-    # Import and register blueprints
-    from routes.auth import auth_bp
-    from routes.patients import patients_bp
-    from routes.doctors import doctors_bp
-    from routes.appointments import appointments_bp
+    # Import and register blueprints (with error handling)
+    try:
+        from routes.auth import auth_bp
+        app.register_blueprint(auth_bp, url_prefix='/api/auth')
+        print("Auth routes registered")
+    except ImportError as e:
+        print(f"Auth routes not available: {e}")
     
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(patients_bp, url_prefix='/api/patients')
-    app.register_blueprint(doctors_bp, url_prefix='/api/doctors')
-    app.register_blueprint(appointments_bp, url_prefix='/api/appointments')
+    try:
+        from routes.patients import patients_bp
+        app.register_blueprint(patients_bp, url_prefix='/api/patients')
+        print("Patients routes registered")
+    except ImportError as e:
+        print(f"Patients routes not available: {e}")
+    
+    try:
+        from routes.doctors import doctors_bp
+        app.register_blueprint(doctors_bp, url_prefix='/api/doctors')
+        print("Doctors routes registered")
+    except ImportError as e:
+        print(f"Doctors routes not available: {e}")
+    
+    try:
+        from routes.appointments import appointments_bp
+        app.register_blueprint(appointments_bp, url_prefix='/api/appointments')
+        print("Appointments routes registered")
+    except ImportError as e:
+        print(f"Appointments routes not available: {e}")
     
     # Initialize database
     with app.app_context():
