@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { appointmentsAPI } from '../services/api';
 import AppointmentCard from '../components/AppointmentCard';
 import AppointmentForm from '../components/AppointmentForm';
 import AppointmentCalendar from '../components/AppointmentCalendar';
@@ -70,14 +70,22 @@ const Appointments = ({ user }) => {
   const fetchData = async () => {
     try {
       const [appointmentsResponse, patientsResponse, doctorsResponse] = await Promise.all([
-        api.get('/appointments'),
-        api.get('/patients'),
-        api.get('/doctors')
+        appointmentsAPI.getAll(),
+        patientsAPI.getAll(),
+        doctorsAPI.getAll()
       ]);
 
-      setAppointments(appointmentsResponse.data);
-      setPatients(patientsResponse.data);
-      setDoctors(doctorsResponse.data);
+      const appointmentsData = appointmentsResponse.data || {};
+      const patientsData = patientsResponse.data || {};
+      const doctorsData = doctorsResponse.data || {};
+
+      const appointmentsArray = Object.values(appointmentsData);
+      const patientsArray = Object.values(patientsData);
+      const doctorsArray = Object.values(doctorsData);
+
+      setAppointments(appointmentsArray);
+      setPatients(patientsArray);
+      setDoctors(doctorsArray);
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to fetch appointment data');

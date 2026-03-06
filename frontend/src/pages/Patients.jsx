@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { patientsAPI } from '../services/api';
 import PatientCard from '../components/PatientCard';
 import PatientForm from '../components/PatientForm';
 import { FiPlus, FiSearch, FiFilter, FiGrid, FiList, FiUsers } from 'react-icons/fi';
@@ -31,9 +31,11 @@ const Patients = ({ user }) => {
 
   const fetchPatients = async () => {
     try {
-      const response = await api.get('/patients');
-      setPatients(response.data);
-      setFilteredPatients(response.data);
+      const response = await patientsAPI.getAll();
+      const patientsData = response.data || {};
+      const patientsArray = Object.values(patientsData);
+      setPatients(patientsArray);
+      setFilteredPatients(patientsArray);
     } catch (error) {
       console.error('Error fetching patients:', error);
       setError('Failed to fetch patients');
