@@ -14,6 +14,31 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    // Clear invalid/expired tokens
+    if (!token || !user) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return config;
+    }
+    
+    // Validate token format (basic check)
+    try {
+      const parsedToken = JSON.parse(atob(token.split('.')[1]));
+      if (parsedToken.exp * 1000 < Date.now()) {
+        console.log('Token expired, clearing...');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        return config;
+      }
+    } catch (e) {
+      console.log('Invalid token format, clearing...');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return config;
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,12 +55,23 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    console.error('API Error:', error);
+    
     if (error.response?.status === 401) {
       // Token expired or invalid
+      console.log('Token expired, clearing localStorage');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
+    
+    if (error.response?.status === 403) {
+      console.log('Access forbidden, redirecting to login');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    
     return Promise.reject(error);
   }
 );
