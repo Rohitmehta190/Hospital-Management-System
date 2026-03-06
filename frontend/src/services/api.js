@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://hospital-backend.onrender.com/api';
+// Use Firebase directly instead of backend API
+const API_BASE_URL = 'https://hospital-management-syst-4c145.firebaseio.com';
 
-// Create axios instance
+// Create axios instance for Firebase Realtime Database
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -10,105 +11,64 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to include auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    
-    // Clear invalid/expired tokens
-    if (!token || !user) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      return config;
-    }
-    
-    // Validate token format (basic check)
-    try {
-      const parsedToken = JSON.parse(atob(token.split('.')[1]));
-      if (parsedToken.exp * 1000 < Date.now()) {
-        console.log('Token expired, clearing...');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        return config;
-      }
-    } catch (e) {
-      console.log('Invalid token format, clearing...');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      return config;
-    }
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Firebase REST API functions
+export const firebaseAPI = {
+  // Get data from Firebase
+  get: (path) => api.get(`/${path}.json`),
+  
+  // Post data to Firebase
+  post: (path, data) => api.post(`/${path}.json`, data),
+  
+  // Update data in Firebase
+  put: (path, data) => api.put(`/${path}.json`, data),
+  
+  // Delete data from Firebase
+  delete: (path) => api.delete(`/${path}.json`),
+};
 
-// Add response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    console.error('API Error:', error);
-    
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      console.log('Token expired, clearing localStorage');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    
-    if (error.response?.status === 403) {
-      console.log('Access forbidden, redirecting to login');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    
-    return Promise.reject(error);
-  }
-);
-
-// Authentication API calls
+// Legacy API exports (for compatibility)
 export const authAPI = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
+  login: (credentials) => Promise.resolve({ success: true }), // Handled by Firebase Auth
+  register: (userData) => Promise.resolve({ success: true }), // Handled by Firebase Auth
 };
 
-// Patients API calls
+// Patients API calls (using Firebase)
 export const patientsAPI = {
-  getAll: () => api.get('/patients'),
-  getById: (id) => api.get(`/patients/${id}`),
-  create: (patientData) => api.post('/patients', patientData),
-  update: (id, patientData) => api.put(`/patients/${id}`, patientData),
-  delete: (id) => api.delete(`/patients/${id}`),
+  getAll: () => firebaseAPI.get('patients'),
+  getById: (id) => firebaseAPI.get(`patients/${id}`),
+  create: (patientData) => firebaseAPI.post('patients', patientData),
+  update: (id, patientData) => firebaseAPI.put(`patients/${id}`, patientData),
+  delete: (id) => firebaseAPI.delete(`patients/${id}`),
 };
 
-// Doctors API calls
+// Doctors API calls (using Firebase)
 export const doctorsAPI = {
-  getAll: () => api.get('/doctors'),
-  getById: (id) => api.get(`/doctors/${id}`),
-  create: (doctorData) => api.post('/doctors', doctorData),
-  update: (id, doctorData) => api.put(`/doctors/${id}`, doctorData),
-  delete: (id) => api.delete(`/doctors/${id}`),
+  getAll: () => firebaseAPI.get('doctors'),
+  getById: (id) => firebaseAPI.get(`doctors/${id}`),
+  create: (doctorData) => firebaseAPI.post('doctors', doctorData),
+  update: (id, doctorData) => firebaseAPI.put(`doctors/${id}`, doctorData),
+  delete: (id) => firebaseAPI.delete(`doctors/${id}`),
 };
 
-// Appointments API calls
+// Appointments API calls (using Firebase)
 export const appointmentsAPI = {
-  getAll: () => api.get('/appointments'),
-  getById: (id) => api.get(`/appointments/${id}`),
-  create: (appointmentData) => api.post('/appointments', appointmentData),
-  update: (id, appointmentData) => api.put(`/appointments/${id}`, appointmentData),
-  delete: (id) => api.delete(`/appointments/${id}`),
-  getByPatient: (patientId) => api.get(`/appointments/patient/${patientId}`),
-  getByDoctor: (doctorId) => api.get(`/appointments/doctor/${doctorId}`),
+  getAll: () => firebaseAPI.get('appointments'),
+  getById: (id) => firebaseAPI.get(`appointments/${id}`),
+  create: (appointmentData) => firebaseAPI.post('appointments', appointmentData),
+  update: (id, appointmentData) => firebaseAPI.put(`appointments/${id}`, appointmentData),
+  delete: (id) => firebaseAPI.delete(`appointments/${id}`),
+  getByPatient: (patientId) => firebaseAPI.get(`appointments`, {
+    params: {
+      orderBy: '"patientId"',
+      equalTo: `"${patientId}"`
+    }
+  }),
+  getByDoctor: (doctorId) => firebaseAPI.get(`appointments`, {
+    params: {
+      orderBy: '"doctorId"',
+      equalTo: `"${doctorId}"`
+    }
+  }),
 };
 
 // Export the default api instance for direct usage
