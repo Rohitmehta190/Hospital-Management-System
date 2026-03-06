@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from config import Config
@@ -12,6 +12,14 @@ def create_app():
     db.init_app(app)
     CORS(app)
     
+    # Health check endpoint
+    @app.route('/')
+    def health_check():
+        return jsonify({
+            'status': 'healthy',
+            'message': 'Hospital Management System API is running'
+        })
+    
     # Import and register blueprints
     from routes.auth import auth_bp
     from routes.patients import patients_bp
@@ -23,8 +31,13 @@ def create_app():
     app.register_blueprint(doctors_bp, url_prefix='/api/doctors')
     app.register_blueprint(appointments_bp, url_prefix='/api/appointments')
     
+    # Initialize database
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+            print("Database tables created successfully")
+        except Exception as e:
+            print(f"Database creation error: {e}")
     
     return app
 
