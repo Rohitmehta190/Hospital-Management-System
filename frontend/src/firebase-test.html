@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Auth Test</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <h1>Firebase Authentication Test</h1>
+    
+    <div>
+        <h2>Register New User</h2>
+        <input type="email" id="regEmail" placeholder="Email">
+        <input type="password" id="regPassword" placeholder="Password">
+        <button onclick="register()">Register</button>
+    </div>
+    
+    <div>
+        <h2>Login</h2>
+        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxM32gSu93HR7Yiz7a7dWcHm_JZ4SAcNM",
+            authDomain: "hospital-management-syst-4c145.firebaseapp.com",
+            projectId: "hospital-management-syst-4c145",
+            storageBucket: "hospital-management-syst-4c145.firebasestorage.app",
+            messagingSenderId: "510584438231",
+            appId: "1:510584438231:web:9d0dbc792b755fe8c11f92"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        function register() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    document.getElementById('result').innerHTML = 
+                        `<h3>Registration Success!</h3><p>User: ${userCredential.user.email}</p>`;
+                })
+                .catch((error) => {
+                    document.getElementById('result').innerHTML = 
+                        `<h3>Registration Error:</h3><p>${error.message}</p>`;
+                });
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    document.getElementById('result').innerHTML = 
+                        `<h3>Login Success!</h3><p>User: ${userCredential.user.email}</p>`;
+                })
+                .catch((error) => {
+                    document.getElementById('result').innerHTML = 
+                        `<h3>Login Error:</h3><p>${error.message}</p>`;
+                });
+        }
+    </script>
+</body>
+</html>
