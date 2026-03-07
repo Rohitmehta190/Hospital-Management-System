@@ -13,17 +13,23 @@ import mockAuth from './mockAuth';
 // Initialize Firebase
 let app = null;
 let auth = null;
-let useMockAuth = false;
+let useMockAuth = localStorage.getItem('useMockAuth') === 'true';
 
 try {
   console.log('Firebase config:', firebaseConfig);
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   console.log("Firebase initialized successfully");
+  
+  // If we previously switched to mock auth, stay with it
+  if (useMockAuth) {
+    console.log("Previously using mock auth, staying with mock auth");
+  }
 } catch (error) {
   console.error("Firebase initialization error:", error);
   console.log("Switching to mock authentication");
   useMockAuth = true;
+  localStorage.setItem('useMockAuth', 'true');
 }
 
 // Authentication functions
@@ -40,6 +46,7 @@ export const registerUser = async (email, password, displayName, role) => {
     if (!auth) {
       console.log('Firebase auth not initialized, switching to mock auth');
       useMockAuth = true;
+      localStorage.setItem('useMockAuth', 'true');
       return mockAuth.registerUser(email, password, displayName, role);
     }
     
@@ -65,6 +72,7 @@ export const registerUser = async (email, password, displayName, role) => {
   } catch (error) {
     console.error("Firebase registration error, switching to mock auth:", error.message);
     useMockAuth = true;
+    localStorage.setItem('useMockAuth', 'true');
     return mockAuth.registerUser(email, password, displayName, role);
   }
 };
@@ -82,6 +90,7 @@ export const loginUser = async (email, password) => {
     if (!auth) {
       console.log('Firebase auth not initialized, switching to mock auth');
       useMockAuth = true;
+      localStorage.setItem('useMockAuth', 'true');
       return mockAuth.loginUser(email, password);
     }
     
@@ -105,6 +114,7 @@ export const loginUser = async (email, password) => {
   } catch (error) {
     console.error("Firebase login error, switching to mock auth:", error.message);
     useMockAuth = true;
+    localStorage.setItem('useMockAuth', 'true');
     return mockAuth.loginUser(email, password);
   }
 };
@@ -121,6 +131,7 @@ export const logoutUser = async () => {
   } catch (error) {
     console.error("Firebase logout error, switching to mock auth:", error.message);
     useMockAuth = true;
+    localStorage.setItem('useMockAuth', 'true');
     return mockAuth.logoutUser();
   }
 };
@@ -156,3 +167,13 @@ export const getCurrentUser = () => {
 };
 
 export { auth };
+
+// Force mock authentication (useful for testing)
+export const forceMockAuth = () => {
+  console.log("Forcing mock authentication mode");
+  useMockAuth = true;
+  localStorage.setItem('useMockAuth', 'true');
+};
+
+// Check current auth mode
+export const isUsingMockAuth = () => useMockAuth;
